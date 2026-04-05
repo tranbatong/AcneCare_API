@@ -29,13 +29,17 @@ public enum ErrorCode {
         INVALID_TOKEN(1013, "Invalid token", HttpStatus.UNAUTHORIZED),
         UNAUTHENTICATED(1014, "Unauthenticated", HttpStatus.UNAUTHORIZED),
         ROLE_NOT_FOUND(1015, "Role not found", HttpStatus.NOT_FOUND),
-        USER_PROFILE_NOT_FOUND(1016, "User profile not found", HttpStatus.NOT_FOUND),
-        USER_PROFILE_ALREADY_EXISTS(1017, "User profile already exists", HttpStatus.BAD_REQUEST),
+
         POST_NOT_FOUND(1018, "Post not found", HttpStatus.NOT_FOUND),
         COMMENT_NOT_FOUND(1019, "Comment not found", HttpStatus.NOT_FOUND),
         LIKE_NOT_FOUND(1020, "Like not found", HttpStatus.NOT_FOUND),
         POST_IMAGE_NOT_FOUND(1021, "Post image not found", HttpStatus.NOT_FOUND),
 
+        ACNE_NOT_FOUND(1016, "Acne not found", HttpStatus.NOT_FOUND),
+        ACNE_PREDICTION_NOT_FOUND(1017, "Acne prediction not found", HttpStatus.NOT_FOUND),
+
+        USER_PROFILE_NOT_FOUND(1018, "User profile not found", HttpStatus.NOT_FOUND),
+        USER_PROFILE_ALREADY_EXISTS(1019, "User profile already exists", HttpStatus.BAD_REQUEST),
         UNCATEGORIZED_ERROR(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR);
 
         int code;
