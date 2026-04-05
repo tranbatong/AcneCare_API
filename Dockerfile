@@ -1,5 +1,4 @@
-# Runtime-only: JAR phải có sẵn (build trên Jenkins hoặc local: ./mvnw package).
-# Tránh chạy Maven trong Docker khi mạng/DNS trong build container không resolve repo.maven.apache.org.
+
 FROM eclipse-temurin:21-jre-noble
 WORKDIR /app
 
