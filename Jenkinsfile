@@ -7,7 +7,6 @@ pipeline {
 
     environment {
         DEPLOY_DIR = '/var/www/acnecare_api'
-        MAVEN_BUILD_IMAGE = 'maven:3.9.14-eclipse-temurin-21-noble'
     }
 
     parameters {
@@ -38,25 +37,6 @@ pipeline {
             }
         }
 
-        stage('Build JAR (Maven + JDK 21 in Docker)') {
-            steps {
-                sh """
-                    set -e
-                    API_DIR='${env.WORKSPACE}/${params.SOURCE_REL_PATH}'
-                    docker pull '${env.MAVEN_BUILD_IMAGE}'
-                    docker run --rm \\
-                      -u "\$(id -u):\$(id -g)" \\
-                      -e HOME=/tmp \\
-                      -v "\$API_DIR:/workspace:rw" \\
-                      -v "\$HOME/.m2:/tmp/m2:rw" \\
-                      -w /workspace \\
-                      '${env.MAVEN_BUILD_IMAGE}' \\
-                      mvn -B -Dmaven.repo.local=/tmp/m2 clean package -DskipTests
-                    ls "\$API_DIR"/target/*.jar
-                """
-            }
-        }
-
         stage('Sync to deploy dir') {
             steps {
                 sh """
@@ -72,7 +52,6 @@ pipeline {
                       --no-times --omit-dir-times --no-perms\
                       --exclude '.env' \
                       --exclude 'mysql-data/' \
-                      --filter 'protect mysql-data/' \
                       '${env.WORKSPACE}/${params.SOURCE_REL_PATH}/' '${env.DEPLOY_DIR}/'
         
                     test -f '${env.DEPLOY_DIR}/.env' || (echo "ERROR: thiếu file .env trong ${env.DEPLOY_DIR}" && exit 1)
@@ -105,7 +84,7 @@ pipeline {
 
     post {
         failure {
-            echo 'Pipeline failed'
+            echo 'Pipeline thất bại. Docker: sudo usermod -aG docker jenkins && sudo systemctl restart jenkins. Rsync Permission denied trên mysql-data/redis-data: thư mục đó thuộc container; cần Jenkinsfile có --filter protect (đã thêm) hoặc dừng stack trước khi deploy.'
         }
     }
 }
