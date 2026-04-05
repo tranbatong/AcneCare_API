@@ -7,6 +7,7 @@ pipeline {
 
     environment {
         DEPLOY_DIR = '/var/www/acnecare_api'
+        MAVEN_BUILD_IMAGE = 'maven:3.9.14-eclipse-temurin-21-noble'
     }
 
     parameters {
@@ -37,14 +38,21 @@ pipeline {
             }
         }
 
-        stage('Build JAR (Maven on agent)') {
+        stage('Build JAR (Maven + JDK 21 in Docker)') {
             steps {
                 sh """
                     set -e
-                    cd '${env.WORKSPACE}/${params.SOURCE_REL_PATH}'
-                    chmod +x mvnw 2>/dev/null || true
-                    ./mvnw -B clean package -DskipTests
-                    ls target/*.jar
+                    API_DIR='${env.WORKSPACE}/${params.SOURCE_REL_PATH}'
+                    docker pull '${env.MAVEN_BUILD_IMAGE}'
+                    docker run --rm \\
+                      -u "\$(id -u):\$(id -g)" \\
+                      -e HOME=/tmp \\
+                      -v "\$API_DIR:/workspace:rw" \\
+                      -v "\$HOME/.m2:/tmp/m2:rw" \\
+                      -w /workspace \\
+                      '${env.MAVEN_BUILD_IMAGE}' \\
+                      mvn -B -Dmaven.repo.local=/tmp/m2 clean package -DskipTests
+                    ls "\$API_DIR"/target/*.jar
                 """
             }
         }
