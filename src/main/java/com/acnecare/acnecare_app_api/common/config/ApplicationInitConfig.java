@@ -12,6 +12,8 @@ import com.acnecare.acnecare_app_api.identity.entity.Role;
 import com.acnecare.acnecare_app_api.identity.entity.User;
 import com.acnecare.acnecare_app_api.identity.repository.RoleRepository;
 import com.acnecare.acnecare_app_api.identity.repository.UserRepository;
+import com.acnecare.acnecare_app_api.profile.entity.UserProfile;
+import com.acnecare.acnecare_app_api.profile.repository.UserProfileRepository;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +29,8 @@ public class ApplicationInitConfig {
     PasswordEncoder passwordEncoder;
 
     @Bean
-    ApplicationRunner applicationRunner(UserRepository userRepository, RoleRepository roleRepository) {
+    ApplicationRunner applicationRunner(UserRepository userRepository, RoleRepository roleRepository,
+            UserProfileRepository userProfileRepository) {
         return args -> {
             if (userRepository.existsByEmail("admin@gmail.com")) {
                 return;
@@ -47,7 +50,7 @@ public class ApplicationInitConfig {
                             .description("Admin role")
                             .build()));
 
-            userRepository.save(User.builder()
+            User user = userRepository.save(User.builder()
                     .email("admin@gmail.com")
                     .password(passwordEncoder.encode("12345678"))
                     .roles(Set.of(adminRole))
@@ -55,6 +58,14 @@ public class ApplicationInitConfig {
                     .updatedAt(LocalDateTime.now())
                     .lastLoginAt(LocalDateTime.now())
                     .status("ACTIVE")
+                    .build());
+
+            userProfileRepository.save(UserProfile.builder()
+                    .userId(user.getId())
+                    .firstName("Admin")
+                    .lastName("Admin")
+                    .phone("1234567890")
+                    .address("1234567890")
                     .build());
 
             log.info("Seeded default admin user admin@gmail.com with ADMIN role");
