@@ -37,6 +37,18 @@ pipeline {
             }
         }
 
+        stage('Build JAR (Maven on agent)') {
+            steps {
+                sh """
+                    set -e
+                    cd '${env.WORKSPACE}/${params.SOURCE_REL_PATH}'
+                    chmod +x mvnw 2>/dev/null || true
+                    ./mvnw -B clean package -DskipTests
+                    ls target/*.jar
+                """
+            }
+        }
+
         stage('Sync to deploy dir') {
             steps {
                 sh """
